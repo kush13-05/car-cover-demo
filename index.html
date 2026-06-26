@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>360 Car Cover System</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #e9ecef; text-align: center; margin-top: 30px; }
+        .dashboard { background-color: white; width: 350px; margin: 0 auto; padding: 20px; border-radius: 15px; box-shadow: 0px 5px 15px rgba(0,0,0,0.2); }
+        h2 { color: #333; margin-top: 0; }
+        p { font-size: 18px; color: #555; margin: 10px 0; }
+        button { padding: 10px 20px; margin: 10px 5px; font-size: 16px; cursor: pointer; border: none; border-radius: 5px; color: white; font-weight: bold; transition: 0.3s; }
+        button:hover { opacity: 0.8; }
+        .btn-open { background-color: #28a745; }
+        .btn-close { background-color: #dc3545; }
+        .btn-rain { background-color: #007bff; width: 90%; }
+
+        /* Yahan se Car aur Cover ka naya design shuru */
+        .car-stage {
+            position: relative;
+            width: 250px;
+            height: 120px;
+            margin: 20px auto;
+            border-bottom: 4px solid #333; /* Yeh zameen (road) hai */
+            overflow: hidden; /* Jo cheez is dibbe se bahar jayegi wo chhip jayegi */
+        }
+        .car-model {
+            font-size: 80px;
+            line-height: 120px; /* Gaadi ko zameen par lane ke liye */
+        }
+        .car-cover {
+            position: absolute;
+            top: -120px; /* Shuru mein cover hawa mein (chhipa hua) rahega */
+            left: 25px;
+            width: 200px;
+            height: 90px;
+            background-color: rgba(52, 73, 94, 0.9); /* Dark blue/grey cover */
+            border-radius: 30px 30px 5px 5px;
+            transition: top 1s ease-in-out; /* Yeh line cover ko smoothly niche layegi (1 second mein) */
+        }
+        
+        /* Jab JS yeh class add karega, cover niche aa jayega */
+        .cover-down {
+            top: 30px; 
+        }
+    </style>
+</head>
+<body>
+
+    <h1>360-Degree Car Cover System</h1>
+    
+    <div class="car-stage">
+        <div class="car-model">🚙</div>
+        <div class="car-cover" id="myCover"></div>
+    </div>
+    
+    <div class="dashboard">
+        <h2>Control Panel</h2>
+        
+        <p><strong>Car Status:</strong> <span id="carStatus">Parked Safely</span></p>
+        <p><strong>Rain Sensor:</strong> <span id="rainStatus">Clear ☀️</span></p>
+
+        <button class="btn-open" onclick="openCover()">Open Cover</button>
+        <button class="btn-close" onclick="closeCover()">Close Cover</button>
+        <br>
+        <button class="btn-rain" onclick="detectRain()">Simulate Rain 🌧️</button>
+    </div>
+
+    <script>
+        function openCover() {
+            document.getElementById("carStatus").innerHTML = "Cover Deployed ⛺";
+            document.getElementById("carStatus").style.color = "green";
+            // Niche wali line cover ko smoothly niche lati hai
+            document.getElementById("myCover").classList.add("cover-down");
+        }
+
+        function closeCover() {
+            document.getElementById("carStatus").innerHTML = "Parked Safely";
+            document.getElementById("carStatus").style.color = "black";
+            document.getElementById("rainStatus").innerHTML = "Clear ☀️";
+            document.getElementById("rainStatus").style.color = "black";
+            // Niche wali line cover ko wapas hawa mein bhej deti hai
+            document.getElementById("myCover").classList.remove("cover-down");
+        }
+
+        function detectRain() {
+            document.getElementById("rainStatus").innerHTML = "Raining 🌧️";
+            document.getElementById("rainStatus").style.color = "red";
+            
+            let rainDetected = true;
+            if (rainDetected) {
+                setTimeout(openCover, 1000); 
+            }
+        }
+    </script>
+</body>
+</html>
