@@ -7,7 +7,6 @@
     <style>
         body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: Arial, sans-serif; }
         
-        /* Yeh humara UI/Dashboard hai jo 3D screen ke upar dikhega */
         #dashboard {
             position: absolute;
             bottom: 20px;
@@ -39,68 +38,86 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     
     <script>
-        // 1. SCENE & CAMERA & RENDERER
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(5, 4, 6); 
+        
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
+        
         const controls = new THREE.OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
 
-        // 2. LIGHTING (Roshni)
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
+        // Roshni
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
         const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
         directionalLight.position.set(10, 20, 10);
         scene.add(directionalLight);
 
-        // 3. ZAMEEN (Road/Floor)
+        // Zameen
         const floorGeometry = new THREE.PlaneGeometry(15, 15);
         const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x555555, side: THREE.DoubleSide });
         const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-        floor.rotation.x = Math.PI / 2; // Flat karne ke liye
+        floor.rotation.x = Math.PI / 2;
         scene.add(floor);
 
-        // 4. CAR (Red Box)
-        const carGeometry = new THREE.BoxGeometry(2, 1, 4);
-        const carMaterial = new THREE.MeshStandardMaterial({ color: 0xcc0000 });
-        const carBox = new THREE.Mesh(carGeometry, carMaterial);
-        carBox.position.y = 0.5; // Zameen ke theek upar
-        scene.add(carBox);
+        // 🌟 NAYA: Proper 3D Car Assemble Karna (THREE.Group)
+        const car = new THREE.Group();
 
-        // 5. CAR COVER (Blue Box) - Thoda bada aur halka transparent
-        const coverGeometry = new THREE.BoxGeometry(2.2, 1.2, 4.2);
+        // 1. Car ka Base (Chassis)
+        const chassisGeo = new THREE.BoxGeometry(2, 0.5, 4);
+        const carMat = new THREE.MeshStandardMaterial({ color: 0xcc0000 }); // Laal rang
+        const chassis = new THREE.Mesh(chassisGeo, carMat);
+        chassis.position.y = 0.5;
+        car.add(chassis);
+
+        // 2. Car ka Upar wala hissa (Cabin)
+        const cabinGeo = new THREE.BoxGeometry(1.5, 0.5, 2);
+        const cabin = new THREE.Mesh(cabinGeo, carMat);
+        cabin.position.y = 1;
+        cabin.position.z = -0.5; // Thoda peeche ki taraf set kiya
+        car.add(cabin);
+
+        // 3. Pahiye (Wheels) banane ka function
+        function createWheel(x, z) {
+            const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.2, 32);
+            const wheelMat = new THREE.MeshStandardMaterial({ color: 0x111111 }); // Kaala rang
+            const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+            wheel.rotation.z = Math.PI / 2; // Pahiye ko seedha khada karna
+            wheel.position.set(x, 0.4, z);
+            car.add(wheel);
+        }
+
+        // Chaaron pahiye lagana (x, z coordinates ke hisaab se)
+        createWheel(1.1, 1.2);   // Aage Right
+        createWheel(-1.1, 1.2);  // Aage Left
+        createWheel(1.1, -1.2);  // Peeche Right
+        createWheel(-1.1, -1.2); // Peeche Left
+
+        scene.add(car);
+
+        // Car Cover (Thoda aur bada kar diya taaki nayi gaadi fit ho jaye)
+        const coverGeometry = new THREE.BoxGeometry(2.6, 1.8, 4.6);
         const coverMaterial = new THREE.MeshStandardMaterial({ color: 0x2c3e50, transparent: true, opacity: 0.95 });
         const coverBox = new THREE.Mesh(coverGeometry, coverMaterial);
-        coverBox.position.y = 5; // Shuru mein hawa mein chhipa rahega
+        coverBox.position.y = 5; 
         scene.add(coverBox);
 
-        // 6. ANIMATION LOGIC (Buttons se control hoga)
+        // Animation Logic
         let isDeploying = false;
         let isRemoving = false;
 
-        function deployCover() {
-            isDeploying = true;
-            isRemoving = false;
-        }
+        function deployCover() { isDeploying = true; isRemoving = false; }
+        function removeCover() { isRemoving = true; isDeploying = false; }
 
-        function removeCover() {
-            isRemoving = true;
-            isDeploying = false;
-        }
-
-        // 7. ANIMATION LOOP (Lagatar chalne wala cycle)
         function animate() {
             requestAnimationFrame(animate);
             controls.update(); 
             
-            // Jaise hi button dabega, cover niche aayega
-            if (isDeploying && coverBox.position.y > 0.6) {
+            if (isDeploying && coverBox.position.y > 0.9) {
                 coverBox.position.y -= 0.05; 
             }
-            // Jab dusra button dabega, cover upar jayega
             if (isRemoving && coverBox.position.y < 5) {
                 coverBox.position.y += 0.05; 
             }
